@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-MessagePublisher-86B3794D-E7F3-4D76-8619-BB480B29C370</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+    <PropertyGroup>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MaidenheadLib" Version="1.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+        <PackageReference Include="MQTTnet" Version="4.0.2.221" />
+        <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.0.2.221" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\WsjtxUdpLib\WsjtxUdpLib.csproj" />
+    </ItemGroup>
+</Project>
