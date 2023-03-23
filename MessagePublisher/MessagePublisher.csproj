@@ -23,4 +23,10 @@
     <ItemGroup>
       <ProjectReference Include="..\WsjtxUdpLib\WsjtxUdpLib.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
 </Project>
