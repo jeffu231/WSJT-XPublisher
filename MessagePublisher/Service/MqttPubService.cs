@@ -8,35 +8,38 @@ using MessagePublisher.Provider;
 
 namespace MessagePublisher.Service;
 
-public class MqttPubService:IMessagePubService
+public class MqttPubService:BackgroundService
 {
-    private readonly WsjtxDataProvider _dataProvider;
+    private readonly IWsjtxDataProvider _dataProvider;
     private readonly ConcurrentDictionary<string, WsjtxStatus> _wsjtxInstance;
     private readonly string _rootTopic;
     private readonly IMqttClient _mqttClient;
     private readonly ILogger<MqttPubService> _logger;
 
-    public MqttPubService(IMqttClient mqttClient, IConfiguration configuration, ILogger<MqttPubService> logger)
+    public MqttPubService(IMqttClient mqttClient, IWsjtxDataProvider wsjtxDataProvider, IConfiguration configuration, ILogger<MqttPubService> logger)
     {
         _mqttClient = mqttClient;
+        _dataProvider = wsjtxDataProvider;
         _logger = logger;
-        _rootTopic = configuration["Mqtt:RootTopic"];
-        var listenIp = configuration["Wsjtx:Listener:Ip"];
-        var listenPort = configuration.GetValue<int>("Wsjtx:Listener:Port");
+        _rootTopic = configuration["Mqtt:RootTopic"]?? string.Empty;
         _wsjtxInstance = new ConcurrentDictionary<string, WsjtxStatus>();
-        _dataProvider = new WsjtxDataProvider(listenIp, listenPort);
-        _dataProvider.DecodeReceived += DataProviderOnDataReceived;
-        _dataProvider.StatusReceived += DataProviderOnStatusReceived;
+        _logger.LogDebug("MQTT Pub service ctr");
+
     }
     
-    public void Start()
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _dataProvider.Start();
-    }
+        _logger.LogDebug("MQTT Pub service Execute");
+        _logger.LogDebug("{DataProviderId}", _dataProvider.Id.ToString());
+        
+        _dataProvider.DecodeReceived += DataProviderOnDataReceived;
+        _dataProvider.StatusReceived += DataProviderOnStatusReceived;
 
-    public void Stop()
-    {
-        _dataProvider.Stop();
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            await Task.Delay(1000, stoppingToken);
+        }
+        _logger.LogDebug("MQTT service execute finishing");
     }
     
     private void DataProviderOnDataReceived(object? sender, WsjtxDecodeEventArgs e)
@@ -46,7 +49,7 @@ public class MqttPubService:IMessagePubService
 
     private async void DataProviderOnStatusReceived(object? sender, WsjtxStatusEventArgs e)
     {
-        _logger.LogDebug("WSJT-X Status Message {Status}", e.Status);
+        //_logger.LogDebug("WSJT-X Status Message {Status}", e.Status);
         await PublishStatus(e.Status);
         if (_wsjtxInstance.ContainsKey(e.Status.Id))
         {
@@ -142,7 +145,7 @@ public class MqttPubService:IMessagePubService
 
     private async Task PublishValue(string instance, string key, string value)
     {
-        Console.Out.WriteLine(value);
+        _logger.LogDebug("Publish to:{RootTopic}/{Instance}/status/{Key} {Value}", _rootTopic, instance, key, value);
         await _mqttClient.Publish($"{_rootTopic}/{instance}/status/{key}", value);
     }
 
@@ -153,4 +156,6 @@ public class MqttPubService:IMessagePubService
         
         return Math.Round(MaidenheadLocator.Azimuth(start, end), 0, MidpointRounding.AwayFromZero);
     }
+
+    
 }

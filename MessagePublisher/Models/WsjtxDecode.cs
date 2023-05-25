@@ -38,17 +38,37 @@ namespace MessagePublisher.Models
         public int DeltaFrequency { get; protected set; }
 
         public TimeSpan SinceMidnight { get; protected set; }
-        
+
+        public int Snr { get; set; }
+
+        public bool LowConfidence { get; set; }
+
         /// <summary>
         /// Delta Time of the decode
         /// </summary>
         public double DeltaTime { get; protected set; }
 
         public string Message { get; protected set; } = String.Empty;
+
+        public bool IsExchangeGrid
+        {
+            get
+            {
+                if (Exchange.Contains('-') ||
+                    Exchange.Contains("73", StringComparison.InvariantCultureIgnoreCase) ||
+                    Exchange.Contains("RRR", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
         
         public override string ToString()
         {
-            return $"Id:{Id} Mode:{Mode} Callsign:{Callsign} SinceMidnight:{SinceMidnight} DeltaFreq:{DeltaFrequency}";
+            return
+                $"Id:{Id} Mode:{Mode} Callsign:{Callsign} Message: {Message} Exchange: {Exchange} SinceMidnight:{SinceMidnight} DeltaFreq:{DeltaFrequency}";
         }
 
         protected void ParseDecode(DecodeMessage decode)
@@ -59,6 +79,9 @@ namespace MessagePublisher.Models
             DeltaFrequency = decode.DeltaFrequency;
             SinceMidnight = decode.SinceMidnight;
             DeltaTime = decode.DeltaTime;
+            Snr = decode.Snr;
+            LowConfidence = decode.LowConfidence;
+            
             var msg = decode.Message.Trim();
             if(msg.Contains("?"))
             {
@@ -79,10 +102,15 @@ namespace MessagePublisher.Models
             var fields = msg.Split(" ");
             if (fields.Length >= 3)
             {
-                Callsign = fields[^2];
+                
                 if (!IsCq)
                 {
+                    Callsign = fields[^2];
                     ContactCallsign = fields[^3];
+                }
+                else
+                {
+                    Callsign = fields[^2];
                 }
             }
             

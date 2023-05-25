@@ -1,8 +1,8 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/runtime:7.0 AS base
 WORKDIR /app
 EXPOSE 2237
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["MessagePublisher/MessagePublisher.csproj", "MessagePublisher/"]
 COPY ["WsjtxUdpLib/WsjtxUdpLib.csproj", "WsjtxUdpLib/"]

@@ -8,12 +8,15 @@ namespace MessagePublisher.Mqtt;
 public class MqttClient : IMqttClient
 {
     private readonly IManagedMqttClient _mqttClient;
+    private readonly ILogger<MqttClient> _logger;
 
-    public MqttClient(IConfiguration configuration)
+    public MqttClient(IConfiguration configuration, ILogger<MqttClient> logger)
     {
+        _logger = logger;
+        
         // Creates a new client
         var builder = new MqttClientOptionsBuilder()
-            .WithClientId("WSJT-X_Publisher.Client")
+            .WithClientId(configuration["Mqtt:ClientId"])
             .WithTcpServer(configuration["Mqtt:Broker"],  configuration.GetValue<int>("Mqtt:Port"));
 
         // Create client options objects
@@ -24,7 +27,7 @@ public class MqttClient : IMqttClient
 
         // Creates the client object
         _mqttClient = new MqttFactory().CreateManagedMqttClient();
-
+        
         // Set up handlers
         _mqttClient.ConnectedAsync += MqttClientOnConnectedAsync;
         _mqttClient.DisconnectedAsync += MqttClientOnDisconnectedAsync;
@@ -32,6 +35,7 @@ public class MqttClient : IMqttClient
 
         // Starts a connection with the Broker
         _mqttClient.StartAsync(options).GetAwaiter().GetResult();
+        
     }
 
     public async Task<bool> Publish(string topic, string message)
@@ -47,19 +51,19 @@ public class MqttClient : IMqttClient
 
     private Task MqttClientOnConnectingFailedAsync(ConnectingFailedEventArgs arg)
     {
-        Console.Out.WriteLine($"Couldn't connect to broker.{arg.Exception}");
+        _logger.LogDebug("Couldn\'t connect to broker.{ArgException}", arg.Exception);
         return Task.CompletedTask;
     }
 
     private Task MqttClientOnDisconnectedAsync(MqttClientDisconnectedEventArgs arg)
     {
-        Console.Out.WriteLine("Successfully disconnected.");
+        _logger.LogDebug("Successfully disconnected.");
         return Task.CompletedTask;
     }
 
     private Task MqttClientOnConnectedAsync(MqttClientConnectedEventArgs arg)
     {
-        Console.Out.WriteLine("Successfully connected.");
+        _logger.LogDebug("Successfully connected.");
         return Task.CompletedTask;
     }
 }

@@ -6,35 +6,53 @@ using MessagePublisher.Models;
 
 namespace MessagePublisher.Provider
 {
-    public class WsjtxDataProvider
+    public class WsjtxDataProvider: BackgroundService, IWsjtxDataProvider
     {
         private readonly int _port;
         private readonly IPAddress _ipAddress;
-       
+        private readonly ILogger<WsjtxDataProvider> _logger;
+
         private WsjtxClient? _wsjtxClient;
-        public WsjtxDataProvider(string ipAddress, int port)
+
+        public WsjtxDataProvider(IConfiguration configuration, ILogger<WsjtxDataProvider> logger)
         {
-            _port = port;
+            _logger = logger;
             
             try
             {
-                _ipAddress = IPAddress.Parse(ipAddress);
+                _ipAddress = IPAddress.Parse(configuration["Wsjtx:Listener:Ip"]);
             }
             catch (Exception e)
             {
-                Console.Out.Write($"Invalid IP Address {e.Message}");
+                _logger.LogCritical("Invalid IP Address {Message}", e.Message);
                 throw;
             }
+            
+            _port = configuration.GetValue<int>("Wsjtx:Listener:Port");
+        }
+        
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            Start();
+            _logger.LogDebug("{DataProviderId}", Id.ToString());
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                await Task.Delay(1000, stoppingToken);
+            }
+            
         }
 
         private void ClientCallback(WsjtxMessage msg, IPEndPoint endPoint)
         {
+            
             if (msg is DecodeMessage dm)
             {
+                _logger.LogDebug("Client Callback Decode");
                 ParseDecodeMessage(dm);
             }
             else if (msg is StatusMessage sm)
             {
+                //_logger.LogDebug("Client Callback Status");
                 ParseStatusMessage(sm);
             }
             else if (msg is HeartbeatMessage hm)
@@ -43,13 +61,14 @@ namespace MessagePublisher.Provider
             }
         }
 
-        public void Start()
+        private void Start()
         {
             if (_wsjtxClient != null)
             {
                 _wsjtxClient.Dispose();
             }
             _wsjtxClient = new WsjtxClient(ClientCallback, _ipAddress, _port, true);
+            _logger.LogDebug("Wsjtx Client created");
         }
 
         public void Stop()
@@ -70,6 +89,7 @@ namespace MessagePublisher.Provider
             
         }
 
+        public Guid Id { get; } = Guid.NewGuid();
         public event EventHandler<WsjtxDecodeEventArgs>? DecodeReceived;
         
         public event EventHandler<WsjtxStatusEventArgs>? StatusReceived;
@@ -83,5 +103,6 @@ namespace MessagePublisher.Provider
         {
             StatusReceived?.Invoke(this,new WsjtxStatusEventArgs(status));
         }
+        
     }
 }

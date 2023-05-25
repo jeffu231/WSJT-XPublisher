@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-MessagePublisher-86B3794D-E7F3-4D76-8619-BB480B29C370</UserSecretsId>
@@ -13,11 +13,11 @@
 
     <ItemGroup>
         <PackageReference Include="MaidenheadLib" Version="1.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
-        <PackageReference Include="MQTTnet" Version="4.0.2.221" />
-        <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.0.2.221" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta1" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+        <PackageReference Include="MQTTnet" Version="4.2.0.706" />
+        <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.2.0.706" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 
     <ItemGroup>

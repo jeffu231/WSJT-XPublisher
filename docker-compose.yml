@@ -1,0 +1,20 @@
+################################################################################
+# WSJTX Publisher Compose
+################################################################################
+# docker-compose -f docker-compose.yml -p myNoderedProject up
+################################################################################
+version: "3.7"
+
+services:
+  WSJT-X-Publisher:
+    image: wsjt-x-publisher
+    restart: unless-stopped
+
+    ports:
+      - "2237:2237/udp"
+
+    build: 
+      context: https://github.com/jeffu231/WSJT-XPublisher.git
+      dockerfile: MessagePublisher/Dockerfile
+    
+   
