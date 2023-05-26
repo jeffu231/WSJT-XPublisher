@@ -20,9 +20,20 @@ namespace M0LTE.WsjtxUdpLib.Messages
      *      accepted in future.
      */
 
-    public class LocationMessage : IWsjtxCommandMessageGenerator
+    public class LocationMessage : WsjtxMessage, IWsjtxCommandMessageGenerator
     {
         public string Id { get; set; }
-        public byte[] GetBytes() => throw new NotImplementedException();
+        
+        public string Locator { get; set; }
+
+        public byte[] GetBytes()
+        {
+            return Qt.Concat(
+                MAGIC_NUMBER,
+                SCHEMA_VERSION,
+                Qt.Encode((uint)MessageType.LOCATION_MESSAGE_TYPE),
+                Qt.Encode(Id),
+                Qt.Encode(Locator));
+        }
     }
 }
