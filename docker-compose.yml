@@ -6,12 +6,13 @@
 version: "3.7"
 
 services:
-  WSJT-X-Publisher:
-    image: wsjt-x-publisher
+  wsjtx-services:
+    image: wsjtx-services
     restart: unless-stopped
 
     ports:
       - "2237:2237/udp"
+      - "80:80"
 
     build: 
       context: https://github.com/jeffu231/WSJT-XPublisher.git

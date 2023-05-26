@@ -15,28 +15,50 @@ public class MqttPubService:BackgroundService
     private readonly string _rootTopic;
     private readonly IMqttClient _mqttClient;
     private readonly ILogger<MqttPubService> _logger;
+    private readonly IConfiguration _config;
+    private bool _isEnabled;
 
     public MqttPubService(IMqttClient mqttClient, IWsjtxDataProvider wsjtxDataProvider, IConfiguration configuration, ILogger<MqttPubService> logger)
     {
         _mqttClient = mqttClient;
         _dataProvider = wsjtxDataProvider;
         _logger = logger;
+        _config = configuration;
         _rootTopic = configuration["Mqtt:RootTopic"]?? string.Empty;
         _wsjtxInstance = new ConcurrentDictionary<string, WsjtxStatus>();
         _logger.LogDebug("MQTT Pub service ctr");
 
     }
     
+    public bool IsEnabled
+    {
+        get => _isEnabled;
+        set
+        {
+            if(_isEnabled == value) return;
+            _isEnabled = value;
+            if (_isEnabled)
+            {
+                _dataProvider.DecodeReceived += DataProviderOnDataReceived;
+                _dataProvider.StatusReceived += DataProviderOnStatusReceived;
+            }
+            else
+            {
+                _dataProvider.DecodeReceived -= DataProviderOnDataReceived;
+                _dataProvider.StatusReceived -= DataProviderOnStatusReceived;
+            }
+            
+            _logger.LogInformation("Mqtt Enabled {Disabled}", _isEnabled);
+        }
+    }
+    
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogDebug("MQTT Pub service Execute");
-        _logger.LogDebug("{DataProviderId}", _dataProvider.Id.ToString());
         
-        _dataProvider.DecodeReceived += DataProviderOnDataReceived;
-        _dataProvider.StatusReceived += DataProviderOnStatusReceived;
-
         while (!stoppingToken.IsCancellationRequested)
         {
+            IsEnabled = _config.GetValue<bool>("Mqtt:Enabled");
             await Task.Delay(1000, stoppingToken);
         }
         _logger.LogDebug("MQTT service execute finishing");
@@ -44,7 +66,7 @@ public class MqttPubService:BackgroundService
     
     private void DataProviderOnDataReceived(object? sender, WsjtxDecodeEventArgs e)
     {
-        
+        //TODO determine what to publish for decode events
     }
 
     private async void DataProviderOnStatusReceived(object? sender, WsjtxStatusEventArgs e)

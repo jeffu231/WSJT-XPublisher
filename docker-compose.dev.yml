@@ -1,7 +1,7 @@
 services:
-  WSJT-X-Publisher:
+  wsjtx-services:
     build: 
-      context: $HOME/RiderProjects/WSJT-XService
+      context: .
       dockerfile: MessagePublisher/Dockerfile
       
 

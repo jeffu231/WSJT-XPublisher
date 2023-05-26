@@ -8,16 +8,17 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace MessagePublisher.Service;
 
-public class DxMapsSpotPubService: BackgroundService
+public class DxMapsSpotService: BackgroundService
 {
-    private readonly ILogger<DxMapsSpotPubService> _logger;
+    private readonly ILogger<DxMapsSpotService> _logger;
     private readonly IConfiguration _config;
     private readonly IWsjtxDataProvider _dataProvider;
     private readonly ConcurrentDictionary<string, WsjtxStatus> _wsjtxInstance;
     private readonly Dictionary<string, MemoryCache> _callCaches;
     private readonly UdpClient _udpClient;
+    private bool _isEnabled;
 
-    public DxMapsSpotPubService(IWsjtxDataProvider wsjtxDataProvider, IConfiguration configuration, ILogger<DxMapsSpotPubService> logger)
+    public DxMapsSpotService(IWsjtxDataProvider wsjtxDataProvider, IConfiguration configuration, ILogger<DxMapsSpotService> logger)
     {
         _logger = logger;
         _config = configuration;
@@ -26,20 +27,37 @@ public class DxMapsSpotPubService: BackgroundService
         _callCaches = new Dictionary<string, MemoryCache>();
         _logger.LogDebug("DxMaps service ctr");
         _udpClient = new UdpClient();
+    }
 
+    public bool IsEnabled
+    {
+        get => _isEnabled;
+        set
+        {
+            if(_isEnabled == value) return;
+            _isEnabled = value;
+            if (_isEnabled)
+            {
+                _dataProvider.DecodeReceived += DataProviderOnDataReceived;
+                _dataProvider.StatusReceived += DataProviderOnStatusReceived;
+            }
+            else
+            {
+                _dataProvider.DecodeReceived -= DataProviderOnDataReceived;
+                _dataProvider.StatusReceived -= DataProviderOnStatusReceived;
+            }
+            
+            _logger.LogInformation("DxMaps Enabled {Disabled}", _isEnabled);
+        }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogDebug("DxMaps service execute starting");
         
-        _dataProvider.DecodeReceived += DataProviderOnDataReceived;
-        _dataProvider.StatusReceived += DataProviderOnStatusReceived;
-        
-        _logger.LogDebug("{DataProviderId}", _dataProvider.Id.ToString());
-        
         while (!stoppingToken.IsCancellationRequested)
         {
+            IsEnabled = _config.GetValue<bool>("DxMaps:Enabled");
             await Task.Delay(1000, stoppingToken);
         }
         
@@ -48,12 +66,6 @@ public class DxMapsSpotPubService: BackgroundService
     
     private async void DataProviderOnDataReceived(object? sender, WsjtxDecodeEventArgs e)
     {
-        if (!_config.GetValue<bool>("DxMaps:Enabled"))
-        {
-            _logger.LogDebug("DxMaps Spots disabled");
-            return;
-        }
-        
         _logger.LogDebug("WSJT-X Data Message {data}", e.Decode);
 
         var decode = e.Decode;
@@ -81,12 +93,6 @@ public class DxMapsSpotPubService: BackgroundService
 
     private void DataProviderOnStatusReceived(object? sender, WsjtxStatusEventArgs e)
     {
-        if (!_config.GetValue<bool>("DxMaps:Enabled"))
-        {
-            _logger.LogDebug("DxMaps Spots disabled");
-            return;
-        }
-        
         _logger.LogDebug("WSJT-X Status Message {Status}", e.Status);
         
         if (_wsjtxInstance.TryGetValue(e.Status.Id, out var status))
