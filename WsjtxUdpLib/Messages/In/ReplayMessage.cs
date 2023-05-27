@@ -18,7 +18,7 @@ namespace M0LTE.WsjtxUdpLib.Messages
      *      message should be used.
      */
 
-    public class ReplayMessage : IWsjtxCommandMessageGenerator
+    public class ReplayMessage : IWsjtxCommandMessage
     {
         public string Id { get; set; }
         public byte[] GetBytes() => throw new NotImplementedException();

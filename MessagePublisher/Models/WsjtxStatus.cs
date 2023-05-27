@@ -55,7 +55,7 @@ namespace MessagePublisher.Models
         
         protected void ParseStatus(StatusMessage msg)
         {
-            Id =  msg.Id;
+            Id = msg.Id;
             ConfigurationName = msg.ConfigurationName;
             Mode = msg.Mode;
             DeCallsign = msg.DeCall;

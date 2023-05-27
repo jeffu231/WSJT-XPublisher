@@ -12,7 +12,7 @@ namespace M0LTE.WsjtxUdpLib.Messages
      *      client to close down gracefully.
      */
 
-    public class CloseMessage : WsjtxMessage, IWsjtxCommandMessageGenerator
+    public class CloseMessage : WsjtxMessage, IWsjtxCommandMessage
     {
         public new static WsjtxMessage Parse(byte[] message)
         {

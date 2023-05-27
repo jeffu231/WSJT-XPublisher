@@ -14,7 +14,7 @@ namespace M0LTE.WsjtxUdpLib.Messages
      *      configuration must exist.
      */
 
-    public class SwitchConfigurationMessage : IWsjtxCommandMessageGenerator
+    public class SwitchConfigurationMessage : IWsjtxCommandMessage
     {
         public string Id { get; set; }
         public byte[] GetBytes() => throw new NotImplementedException();

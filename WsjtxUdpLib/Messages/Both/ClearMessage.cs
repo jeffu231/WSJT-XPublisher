@@ -25,7 +25,7 @@ namespace M0LTE.WsjtxUdpLib.Messages.Both
      *         2  - clear both "Band Activity" and "Rx Frequency" windows
      */
 
-    public class ClearMessage : WsjtxMessage, IWsjtxCommandMessageGenerator
+    public class ClearMessage : WsjtxMessage, IWsjtxCommandMessage
     {
         public new static WsjtxMessage Parse(byte[] message)
         {

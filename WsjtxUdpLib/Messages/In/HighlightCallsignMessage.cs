@@ -33,7 +33,7 @@
     /// instructions and apply them to all decoded messages in the band activity window. To clear and cancel highlighting
     /// send  an invalid  QColor value  for either or both of the background and foreground fields.
     /// </summary>
-    public class HighlightCallsignMessage : WsjtxMessage, IWsjtxCommandMessageGenerator
+    public class HighlightCallsignMessage : WsjtxMessage, IWsjtxCommandMessage
     {
         //public string Id { get; set; }
         /// <summary>

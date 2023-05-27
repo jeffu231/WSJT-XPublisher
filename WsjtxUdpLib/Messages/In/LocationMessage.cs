@@ -20,7 +20,7 @@ namespace M0LTE.WsjtxUdpLib.Messages
      *      accepted in future.
      */
 
-    public class LocationMessage : WsjtxMessage, IWsjtxCommandMessageGenerator
+    public class LocationMessage : WsjtxMessage, IWsjtxCommandMessage
     {
         public string Id { get; set; }
         

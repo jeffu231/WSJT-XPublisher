@@ -34,7 +34,7 @@ namespace M0LTE.WsjtxUdpLib.Messages
      *      message.
      */
 
-    public class FreeTextMessage : IWsjtxCommandMessageGenerator
+    public class FreeTextMessage : IWsjtxCommandMessage
     {
         public string Id { get; set; }
         public byte[] GetBytes() => throw new NotImplementedException();

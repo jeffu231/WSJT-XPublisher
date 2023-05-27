@@ -354,6 +354,7 @@ namespace M0LTE.WsjtxUdpLib.Messages
 
         public readonly static byte[] MAGIC_NUMBER = new byte[] { 0xad, 0xbc, 0xcb, 0xda };
         public readonly static byte[] SCHEMA_VERSION = new byte[] { 0, 0, 0, 3 };
+        public readonly static byte[] SCHEMA_VERSION_2 = new byte[] { 0, 0, 0, 2 };
        
     }
 }

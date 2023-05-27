@@ -25,7 +25,7 @@ namespace M0LTE.WsjtxUdpLib.Messages
      *      silently ignored.
      */
 
-    public class ConfigureMessage : IWsjtxCommandMessageGenerator
+    public class ConfigureMessage : IWsjtxCommandMessage
     {
         public string Id { get; set; }
         public byte[] GetBytes() => throw new NotImplementedException();

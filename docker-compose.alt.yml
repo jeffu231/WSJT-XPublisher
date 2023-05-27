@@ -1,7 +1,7 @@
 ################################################################################
-# WSJTX Services Compose
-# This logic requires access to the host network in order to discover
-# the source ip of the incoming udp packets 
+# WSJTX Service Compose
+# This can be used if you do not intend to use the capability to send messages 
+# to WSJTX. 
 ################################################################################
 # docker-compose -f docker-compose.yml -p wsjtx-service up
 ################################################################################
@@ -11,10 +11,20 @@ services:
   wsjtx-services:
     image: wsjtx-services
     restart: unless-stopped
-
-    network_mode: "host"
-   
+    ports:
+      - "2237:2237/udp"
+      - "80:8085"
+    networks:
+      - k9kld
+    
     build: 
       context: https://github.com/jeffu231/WSJT-XPublisher.git
       dockerfile: MessagePublisher/Dockerfile
     
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wsjtx-services-api.rule=Host(`docker01.home.kb9kld.org`) && (PathPrefix(`/api/wsjtx/`))" 
+
+networks:
+  k9kld:
+    external: true

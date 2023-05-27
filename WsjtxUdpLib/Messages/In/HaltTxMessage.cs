@@ -12,7 +12,7 @@ namespace M0LTE.WsjtxUdpLib.Messages
      *      using this message.
      */
 
-    public class HaltTxMessage : IWsjtxCommandMessageGenerator
+    public class HaltTxMessage : IWsjtxCommandMessage
     {
         public string Id { get; set; }
         public byte[] GetBytes() => throw new NotImplementedException();

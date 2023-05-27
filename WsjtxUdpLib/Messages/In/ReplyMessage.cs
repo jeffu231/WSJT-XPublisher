@@ -43,7 +43,7 @@ namespace M0LTE.WsjtxUdpLib.Messages
      *          Group switch    0x40  X11 only
      */
 
-    public class ReplyMessage : IWsjtxCommandMessageGenerator
+    public class ReplyMessage : IWsjtxCommandMessage
     {
         public string Id { get; set; }
         public byte[] GetBytes() => throw new NotImplementedException();

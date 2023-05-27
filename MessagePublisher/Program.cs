@@ -35,6 +35,7 @@ public class Program
 
     private static void ConfigureServices(IServiceCollection services)
     {
+        services.AddSingleton<IWsjtxClient, WsjtxClient>();
         services.AddSingleton<IMqttClient, MqttClient>();
         services.AddSingleton<IWsjtxDataProvider, WsjtxDataProvider>();
         services.AddHostedService<IWsjtxDataProvider>(provider => provider.GetRequiredService<IWsjtxDataProvider>());

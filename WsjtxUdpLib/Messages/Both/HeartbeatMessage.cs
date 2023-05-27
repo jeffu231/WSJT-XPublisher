@@ -3,7 +3,7 @@ using System;
 
 namespace M0LTE.WsjtxUdpLib.Messages
 {
-    public class HeartbeatMessage : WsjtxMessage, IWsjtxCommandMessageGenerator
+    public class HeartbeatMessage : WsjtxMessage, IWsjtxCommandMessage
     {
         /*
          * Message       Direction Value                  Type
@@ -71,7 +71,7 @@ namespace M0LTE.WsjtxUdpLib.Messages
         public string Version { get; set; }
         public string Revision { get; set; }
 
-        public override string ToString() => $"Heartbeat id:{Id} maxSchemaNumber:{MaxSchemaNumber} version:{Version} revision:{Revision}";
+        public override string ToString() => $"Heartbeat id:{Id} maxSchemaNumber:{MaxSchemaNumber} schema {SchemaVersion} version:{Version} revision:{Revision}";
 
         public byte[] GetBytes() => throw new NotImplementedException();
     }
