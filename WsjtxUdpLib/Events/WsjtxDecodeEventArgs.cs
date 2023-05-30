@@ -1,6 +1,7 @@
-using MessagePublisher.Models;
+using System;
+using M0LTE.WsjtxUdpLib.Models;
 
-namespace MessagePublisher.Events
+namespace M0LTE.WsjtxUdpLib.Events
 {
     public class WsjtxDecodeEventArgs:EventArgs
     {

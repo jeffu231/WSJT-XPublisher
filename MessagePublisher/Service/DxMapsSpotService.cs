@@ -1,9 +1,10 @@
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Text;
-using MessagePublisher.Events;
+using M0LTE.WsjtxUdpLib.Events;
+using M0LTE.WsjtxUdpLib.Models;
+using M0LTE.WsjtxUdpLib.Provider;
 using MessagePublisher.Models;
-using MessagePublisher.Provider;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace MessagePublisher.Service;

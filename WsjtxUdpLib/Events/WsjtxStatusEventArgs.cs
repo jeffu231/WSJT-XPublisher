@@ -1,6 +1,6 @@
-using MessagePublisher.Models;
+using M0LTE.WsjtxUdpLib.Models;
 
-namespace MessagePublisher.Events
+namespace M0LTE.WsjtxUdpLib.Events
 {
     public class WsjtxStatusEventArgs
     {

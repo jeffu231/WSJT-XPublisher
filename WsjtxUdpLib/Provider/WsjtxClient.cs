@@ -1,9 +1,13 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using M0LTE.WsjtxUdpLib.Messages;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
-namespace MessagePublisher.Provider
+namespace M0LTE.WsjtxUdpLib.Provider
 {
     /// <summary>
     /// WSJTX Client class based on the example from M0LTE.WsjtxUdpLib
@@ -57,7 +61,7 @@ namespace MessagePublisher.Provider
                     var msg = WsjtxMessage.Parse(datagram);
                     if (msg is CloseMessage cm)
                     {
-                        _endPoints.Remove(msg.Id, out _);
+                        _endPoints.TryRemove(msg.Id, out _);
                     }
                     else
                     {

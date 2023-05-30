@@ -1,11 +1,17 @@
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using M0LTE.WsjtxUdpLib.Events;
 using M0LTE.WsjtxUdpLib.Messages;
 using M0LTE.WsjtxUdpLib.Messages.Out;
-using MessagePublisher.Events;
-using MessagePublisher.Models;
-using Microsoft.Extensions.Caching.Memory;
+using M0LTE.WsjtxUdpLib.Models;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-namespace MessagePublisher.Provider
+namespace M0LTE.WsjtxUdpLib.Provider
 {
     public class WsjtxDataProvider: BackgroundService, IWsjtxDataProvider
     {

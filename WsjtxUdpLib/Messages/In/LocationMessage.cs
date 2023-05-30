@@ -22,9 +22,7 @@ namespace M0LTE.WsjtxUdpLib.Messages
 
     public class LocationMessage : WsjtxMessage, IWsjtxCommandMessage
     {
-        public string Id { get; set; }
-        
-        public string Locator { get; set; }
+        public string Locator { get; set; } = string.Empty;
 
         public byte[] GetBytes()
         {

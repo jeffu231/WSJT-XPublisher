@@ -1,6 +1,7 @@
+using System;
 using M0LTE.WsjtxUdpLib.Messages.Out;
 
-namespace MessagePublisher.Models
+namespace M0LTE.WsjtxUdpLib.Models
 {
     public class WsjtxStatus
     {

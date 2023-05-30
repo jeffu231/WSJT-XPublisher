@@ -1,8 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using M0LTE.WsjtxUdpLib.Events;
 using M0LTE.WsjtxUdpLib.Messages;
-using MessagePublisher.Events;
-using MessagePublisher.Models;
+using M0LTE.WsjtxUdpLib.Models;
+using Microsoft.Extensions.Hosting;
 
-namespace MessagePublisher.Provider;
+namespace M0LTE.WsjtxUdpLib.Provider;
 
 public interface IWsjtxDataProvider: IHostedService
 { 
@@ -21,7 +25,7 @@ public interface IWsjtxDataProvider: IHostedService
     public WsjtxStatus? Status(string id);
 
     /// <summary>
-    /// Updates the grid locator in the specified instance of WSJTX
+    /// Sends a message to the specified instance of WSJTX
     /// </summary>
     /// <param name="msg">The WSJTX Message to send</param>
     /// <returns></returns>
