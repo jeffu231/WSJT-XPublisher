@@ -1,9 +1,10 @@
 ################################################################################
 # WSJTX Service Compose
 # This can be used if you do not intend to use the capability to send messages 
-# to WSJTX. 
+# to WSJTX. Since docker masqs the incoming host and port for udp the code cannot 
+# determine the ip and port of the WSJTX instances when not in HOST networking
 ################################################################################
-# docker-compose -f docker-compose.yml -p wsjtx-service up
+# docker-compose -f docker-compose.yml -p wsjtx-services up
 ################################################################################
 version: "3.7"
 
@@ -15,16 +16,19 @@ services:
       - "2237:2237/udp"
       - "80:8085"
     networks:
-      - k9kld
+      - traefik-net
     
     build: 
       context: https://github.com/jeffu231/WSJT-XPublisher.git
       dockerfile: MessagePublisher/Dockerfile
+      args:
+        - GITHUB_USERNAME=${GITHUB_USERNAME}
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
     
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.wsjtx-services-api.rule=Host(`docker01.home.kb9kld.org`) && (PathPrefix(`/api/wsjtx/`))" 
 
 networks:
-  k9kld:
+  traefik-net:
     external: true

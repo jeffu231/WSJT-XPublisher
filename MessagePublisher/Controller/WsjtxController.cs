@@ -1,7 +1,7 @@
-using M0LTE.WsjtxUdpLib.Messages;
-using M0LTE.WsjtxUdpLib.Provider;
 using MessagePublisher.Attributes;
 using Microsoft.AspNetCore.Mvc;
+using WsjtxClient.Messages.In;
+using WsjtxClient.Provider;
 
 namespace MessagePublisher.Controller;
 

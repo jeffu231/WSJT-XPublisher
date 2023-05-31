@@ -1,10 +1,10 @@
 using System.Collections.Concurrent;
 using System.Globalization;
-using M0LTE.WsjtxUdpLib.Events;
-using M0LTE.WsjtxUdpLib.Models;
-using M0LTE.WsjtxUdpLib.Provider;
 using MaidenheadLib;
 using MessagePublisher.Mqtt;
+using WsjtxClient.Events;
+using WsjtxClient.Models;
+using WsjtxClient.Provider;
 
 namespace MessagePublisher.Service;
 

@@ -7,6 +7,11 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["MessagePublisher/MessagePublisher.csproj", "MessagePublisher/"]
 COPY ["WsjtxUdpLib/WsjtxUdpLib.csproj", "WsjtxUdpLib/"]
+
+ARG GITHUB_USERNAME
+ARG GITHUB_TOKEN
+RUN dotnet nuget add source "https://nuget.pkg.github.com/jeffu231/index.json" -n github -u ${GITHUB_USERNAME} -p ${GITHUB_TOKEN} --store-password-in-clear-text
+
 RUN dotnet restore "MessagePublisher/MessagePublisher.csproj"
 COPY . .
 WORKDIR "/src/MessagePublisher"
