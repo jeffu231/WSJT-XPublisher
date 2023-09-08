@@ -14,17 +14,17 @@ public class DxMapsSpotService: BackgroundService
 {
     private readonly ILogger<DxMapsSpotService> _logger;
     private readonly IConfiguration _config;
-    private readonly IWsjtxDataProvider _dataProvider;
+    private readonly IWsjtxDataProviderManager _dataProviderManager;
     private readonly ConcurrentDictionary<string, WsjtxStatus> _wsjtxInstance;
     private readonly Dictionary<string, MemoryCache> _callCaches;
     private readonly UdpClient _udpClient;
     private bool _isEnabled;
 
-    public DxMapsSpotService(IWsjtxDataProvider wsjtxDataProvider, IConfiguration configuration, ILogger<DxMapsSpotService> logger)
+    public DxMapsSpotService(IWsjtxDataProviderManager wsjtxDataProviderManager, IConfiguration configuration, ILogger<DxMapsSpotService> logger)
     {
         _logger = logger;
         _config = configuration;
-        _dataProvider = wsjtxDataProvider;
+        _dataProviderManager = wsjtxDataProviderManager;
         _wsjtxInstance = new ConcurrentDictionary<string, WsjtxStatus>();
         _callCaches = new Dictionary<string, MemoryCache>();
         _logger.LogDebug("DxMaps service ctr");
@@ -40,16 +40,27 @@ public class DxMapsSpotService: BackgroundService
             _isEnabled = value;
             if (_isEnabled)
             {
-                _dataProvider.DecodeReceived += DataProviderOnDataReceived;
-                _dataProvider.StatusReceived += DataProviderOnStatusReceived;
+                foreach (var wsjtxDataProvider in _dataProviderManager.WsjtxDataProviders)
+                {
+                    _logger.LogDebug("Subscribing to provider {Id}", wsjtxDataProvider.Id);
+                    wsjtxDataProvider.DecodeReceived += DataProviderManagerOnDataReceived;
+                    wsjtxDataProvider.StatusReceived += DataProviderManagerOnStatusReceived;
+                }
+                
             }
             else
             {
-                _dataProvider.DecodeReceived -= DataProviderOnDataReceived;
-                _dataProvider.StatusReceived -= DataProviderOnStatusReceived;
+                foreach (var wsjtxDataProvider in _dataProviderManager.WsjtxDataProviders)
+                {
+                    _logger.LogDebug("UnSubscribing to provider {Id}", wsjtxDataProvider.Id);
+                    wsjtxDataProvider.DecodeReceived -= DataProviderManagerOnDataReceived;
+                    wsjtxDataProvider.StatusReceived -= DataProviderManagerOnStatusReceived;
+                }
             }
             
             _logger.LogInformation("DxMaps Enabled {Disabled}", _isEnabled);
+            _logger.LogInformation("DxMaps Send Spot Enabled {Enabled}", 
+                _config.GetValue<bool>("DxMaps:SendSpot"));
         }
     }
 
@@ -66,7 +77,7 @@ public class DxMapsSpotService: BackgroundService
         _logger.LogDebug("DxMaps service execute finishing");
     }
     
-    private async void DataProviderOnDataReceived(object? sender, WsjtxDecodeEventArgs e)
+    private async void DataProviderManagerOnDataReceived(object? sender, WsjtxDecodeEventArgs e)
     {
         _logger.LogDebug("WSJT-X Data Message {data}", e.Decode);
 
@@ -93,7 +104,7 @@ public class DxMapsSpotService: BackgroundService
         
     }
 
-    private void DataProviderOnStatusReceived(object? sender, WsjtxStatusEventArgs e)
+    private void DataProviderManagerOnStatusReceived(object? sender, WsjtxStatusEventArgs e)
     {
         _logger.LogDebug("WSJT-X Status Message {Status}", e.Status);
         

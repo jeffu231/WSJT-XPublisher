@@ -4,13 +4,12 @@ using MaidenheadLib;
 using MessagePublisher.Mqtt;
 using WsjtxClient.Events;
 using WsjtxClient.Models;
-using WsjtxClient.Provider;
 
 namespace MessagePublisher.Service;
 
 public class MqttPubService:BackgroundService
 {
-    private readonly IWsjtxDataProvider _dataProvider;
+    private readonly IWsjtxDataProviderManager _dataProviderManager;
     private readonly ConcurrentDictionary<string, WsjtxStatus> _wsjtxInstance;
     private readonly string _rootTopic;
     private readonly IMqttClient _mqttClient;
@@ -18,10 +17,10 @@ public class MqttPubService:BackgroundService
     private readonly IConfiguration _config;
     private bool _isEnabled;
 
-    public MqttPubService(IMqttClient mqttClient, IWsjtxDataProvider wsjtxDataProvider, IConfiguration configuration, ILogger<MqttPubService> logger)
+    public MqttPubService(IMqttClient mqttClient, IWsjtxDataProviderManager wsjtxDataProviderManager, IConfiguration configuration, ILogger<MqttPubService> logger)
     {
         _mqttClient = mqttClient;
-        _dataProvider = wsjtxDataProvider;
+        _dataProviderManager = wsjtxDataProviderManager;
         _logger = logger;
         _config = configuration;
         _rootTopic = configuration["Mqtt:RootTopic"]?? string.Empty;
@@ -39,13 +38,22 @@ public class MqttPubService:BackgroundService
             _isEnabled = value;
             if (_isEnabled)
             {
-                _dataProvider.DecodeReceived += DataProviderOnDataReceived;
-                _dataProvider.StatusReceived += DataProviderOnStatusReceived;
+                foreach (var wsjtxDataProvider in _dataProviderManager.WsjtxDataProviders)
+                {
+                    _logger.LogDebug("Subscribing to provider {Id}", wsjtxDataProvider.Id);
+                    wsjtxDataProvider.DecodeReceived += DataProviderOnDataReceived;
+                    wsjtxDataProvider.StatusReceived += DataProviderOnStatusReceived;
+                }
+                
             }
             else
             {
-                _dataProvider.DecodeReceived -= DataProviderOnDataReceived;
-                _dataProvider.StatusReceived -= DataProviderOnStatusReceived;
+                foreach (var wsjtxDataProvider in _dataProviderManager.WsjtxDataProviders)
+                {
+                    _logger.LogDebug("UnSubscribing to provider {Id}", wsjtxDataProvider.Id);
+                    wsjtxDataProvider.DecodeReceived -= DataProviderOnDataReceived;
+                    wsjtxDataProvider.StatusReceived -= DataProviderOnStatusReceived;
+                }
             }
             
             _logger.LogInformation("Mqtt Enabled {Disabled}", _isEnabled);

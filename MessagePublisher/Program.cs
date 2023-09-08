@@ -14,7 +14,7 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         
-        ConfigureServices(builder.Services);
+        ConfigureServices(builder);
 
         ConfigureApiVersioning(builder);
             
@@ -37,23 +37,25 @@ public static class Program
         app.Run();
     }
 
-    private static void ConfigureServices(IServiceCollection services)
+    private static void ConfigureServices(WebApplicationBuilder builder)
     {
-        services.AddSingleton<IWsjtxClient, WsjtxClient.Provider.WsjtxClient>();
-        services.AddSingleton<IMqttClient, MqttClient>();
-        services.AddSingleton<IWsjtxDataProvider, WsjtxDataProvider>();
-        services.AddHostedService<IWsjtxDataProvider>(provider => provider.GetRequiredService<IWsjtxDataProvider>());
-        services.AddHostedService<MqttPubService>();
-        services.AddHostedService<DxMapsSpotService>();
-        services.AddHostedService<FlexRadioSpotService>();
-        
-        services.AddProblemDetails();
-        
-        services.AddControllers(o =>
-        {
-            o.RespectBrowserAcceptHeader = true;
-            o.ReturnHttpNotAcceptable = true;
-        }).AddNewtonsoftJson().AddXmlSerializerFormatters();
+        Console.Out.WriteLine("Configure Services");
+        builder.Services.ConfigureServicesFromConfig(builder.Configuration);
+        // services.AddSingleton<IWsjtxClient, WsjtxClient.Provider.WsjtxClient>();
+        // services.AddSingleton<IMqttClient, MqttClient>();
+        // services.AddSingleton<IWsjtxDataProvider, WsjtxDataProvider>();
+        // services.AddHostedService<IWsjtxDataProvider>(provider => provider.GetRequiredService<IWsjtxDataProvider>());
+        // services.AddHostedService<MqttPubService>();
+        // services.AddHostedService<DxMapsSpotService>();
+        // services.AddHostedService<FlexRadioSpotService>();
+        //
+        // services.AddProblemDetails();
+        //
+        // services.AddControllers(o =>
+        // {
+        //     o.RespectBrowserAcceptHeader = true;
+        //     o.ReturnHttpNotAcceptable = true;
+        // }).AddNewtonsoftJson().AddXmlSerializerFormatters();
     }
     
     private static void ConfigureApiVersioning(WebApplicationBuilder builder)
