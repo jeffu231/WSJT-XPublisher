@@ -3,6 +3,7 @@ using MessagePublisher.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.Net.Http.Headers;
 using WsjtxClient.Provider;
 
 namespace MessagePublisher;
@@ -18,6 +19,8 @@ public static class Program
         ConfigureApiVersioning(builder);
             
         ConfigureSwagger(builder);
+        
+        builder.Services.AddHttpClient<FlexRadioApiService>();
 
         var app = builder.Build();
 
@@ -42,6 +45,7 @@ public static class Program
         services.AddHostedService<IWsjtxDataProvider>(provider => provider.GetRequiredService<IWsjtxDataProvider>());
         services.AddHostedService<MqttPubService>();
         services.AddHostedService<DxMapsSpotService>();
+        services.AddHostedService<FlexRadioSpotService>();
         
         services.AddProblemDetails();
         
