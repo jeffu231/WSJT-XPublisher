@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using MessagePublisher.Models;
 using Microsoft.Extensions.Caching.Memory;
 using WsjtxClient.Events;
@@ -70,7 +71,7 @@ public class DxMapsSpotService: BackgroundService
         _logger.LogDebug("WSJT-X Data Message {data}", e.Decode);
 
         var decode = e.Decode;
-        if (!decode.LowConfidence && decode.IsExchangeGrid && !decode.Callsign.Contains("<"))
+        if (!decode.LowConfidence && decode.IsExchangeGrid && IsValidCall(decode.Callsign))
         {
             if (_wsjtxInstance.TryGetValue(decode.Id, out var instance))
             {
@@ -115,6 +116,14 @@ public class DxMapsSpotService: BackgroundService
         }
     }
     
+    private bool IsValidCall(string call)
+    {
+        if (call.Contains('<') || call.Contains('>')) return false;
+        if (call.All(char.IsDigit)) return false;
+        if (!call.Any(char.IsDigit)) return false;
+        return true;
+    }
+    
     private async Task<DxMapSpot> CreateSpot(WsjtxStatus instance, WsjtxDecode decode)
     {
         _logger.LogDebug("Create Spot");
@@ -140,12 +149,22 @@ public class DxMapsSpotService: BackgroundService
 
     private async Task SendSpot(DxMapSpot spot)
     {
-        if (_config.GetValue<bool>("DxMaps:Enabled"))
+        if (!spot.IsSpotValid)
+        {
+            _logger.LogError("Invalid spot skipped for DxMaps: {Spot}", spot.CreateSpotMessage());
+            return;
+        }
+        
+        if (_config.GetValue<bool>("DxMaps:SendSpot"))
         {
             var buffer = Encoding.ASCII.GetBytes(spot.CreateSpotMessage());
             var sent = await _udpClient.SendAsync(buffer, buffer.Length, _config["DxMaps:Host"], 
                 _config.GetValue<int>("DxMaps:Port"));
             _logger.LogInformation("Sent {Payload} of {Sent} bytes to DxMaps", spot.CreateSpotMessage(), sent);
+        }
+        else
+        {
+            _logger.LogInformation("DxMaps Spot Disabled: {Payload} not sent", spot.CreateSpotMessage());
         }
     }
 }

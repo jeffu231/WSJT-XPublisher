@@ -6,6 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-MessagePublisher-86B3794D-E7F3-4D76-8619-BB480B29C370</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <Version>1.1.0</Version>
+        <AssemblyVersion>1.1.0</AssemblyVersion>
     </PropertyGroup>
     <PropertyGroup>
         <ServerGarbageCollection>true</ServerGarbageCollection>
@@ -22,7 +24,7 @@
         <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.2.0.706" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="wsjtxclient" Version="1.0.0" />
+        <PackageReference Include="wsjtxclient" Version="1.1.2" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace MessagePublisher.Models;
 
 public class DxMapSpot
@@ -23,6 +25,22 @@ public class DxMapSpot
 
     public bool IsCq { get; set; }
 
+    public bool IsSpotValid
+    {
+        get
+        {
+            if (Freq <= 0) return false;
+            if (DxCallsign.Contains('<') || DxCallsign.Contains('>')) return false;
+            if (DxCallsign.All(char.IsDigit)) return false;
+            if (!DxCallsign.Any(char.IsDigit)) return false;
+            if(!Regex.IsMatch(DxGrid, "^[A-Ra-r]{2}[0-9]{2}([A-Xa-x]{2}|$)\\z"))
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+    
     public string CreateSpotMessage()
     {
         var spotType = IsCq ? "CQ" : "HRD";
