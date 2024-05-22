@@ -1,7 +1,10 @@
 using System.Collections.Concurrent;
 using System.Globalization;
 using MaidenheadLib;
+using MessagePublisher.Models;
 using MessagePublisher.Mqtt;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using WsjtxClient.Events;
 using WsjtxClient.Models;
 
@@ -101,6 +104,13 @@ public class MqttPubService:BackgroundService
         }
         if(_wsjtxInstance.TryGetValue(status.Id, out var previousStatus))
         {
+            _logger.LogInformation("Found previous status for {StatusId}", status.Id);
+            if (status.DxCallsign != previousStatus.DxCallsign ||
+                status.DxGrid != previousStatus.DxGrid)
+            {
+                await PublishQsoInfo(status, instance);
+            }
+            
             if (status.DxCallsign != previousStatus.DxCallsign)
             {
                 await PublishValue(instance, "dx_call", status.DxCallsign);
@@ -146,6 +156,8 @@ public class MqttPubService:BackgroundService
         }
         else
         {
+            _logger.LogInformation("Did not find previous status for {StatusId}", status.Id);
+            await PublishQsoInfo(status, instance);
             await PublishValue(instance, "dx_call", status.DxCallsign);
             await PublishValue(instance, "dx_grid", status.DxGrid);
             await PublishValue(instance, "de_call", status.DeCallsign);
@@ -155,21 +167,34 @@ public class MqttPubService:BackgroundService
             await PublishValue(instance, "is_tx_enabled", status.IsTxEnabled.ToString());
             await PublishValue(instance, "dial_frequency", status.DialFrequency.ToString());
             await PublishBearing(instance, status.DeGrid, status.DxGrid);
-           
         }
         
         
     }
 
+    private async Task PublishQsoInfo(WsjtxStatus status, string instance)
+    {
+        _logger.LogInformation("QsoInfo srcGrid: '{SrcGrid}' destGrid: '{DestGrid}'", status.DeGrid, status.DxGrid);
+        var bearing = -1d;
+        if (!string.IsNullOrEmpty(status.DeGrid) && !string.IsNullOrEmpty(status.DxGrid))
+        {
+            bearing = Bearing(status.DeGrid, status.DxGrid);
+        }
+        var dxStation = new QsoInfo(status.DxCallsign, status.DxGrid, 
+            bearing, status.DeCallsign, status.DeGrid);
+        await PublishValue(instance, "qso_info", JsonConvert.SerializeObject(dxStation,
+            new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() }));
+    }
+
     private async Task PublishBearing(string instance, string deGrid, string dxGrid)
     {
-        if (deGrid != String.Empty && dxGrid != String.Empty)
+        if(string.IsNullOrEmpty(deGrid) || string.IsNullOrEmpty(dxGrid))
         {
-            await PublishValue(instance, "bearing", Bearing(deGrid, dxGrid).ToString(CultureInfo.InvariantCulture));
+            await PublishValue(instance, "bearing", String.Empty);
         }
         else
         {
-            await PublishValue(instance, "bearing", String.Empty);
+            await PublishValue(instance, "bearing", Bearing(deGrid.Trim(), dxGrid.Trim()).ToString(CultureInfo.InvariantCulture));
         }
     }
 
@@ -179,8 +204,9 @@ public class MqttPubService:BackgroundService
         await _mqttClient.Publish($"{_rootTopic}/{instance}/status/{key}", value);
     }
 
-    private static double Bearing(string srcGrid, string destGrid)
+    private double Bearing(string srcGrid, string destGrid)
     {
+        _logger.LogInformation("srcGrid: '{SrcGrid}' destGrid: '{DestGrid}'", srcGrid, destGrid);
         var start = MaidenheadLocator.LocatorToLatLng(srcGrid);
         var end = MaidenheadLocator.LocatorToLatLng(destGrid);
         
