@@ -93,7 +93,7 @@ public class FlexRadioSpotService:BackgroundService
         _logger.LogDebug("WSJT-X Data Message {data}", e.Decode);
 
         var decode = e.Decode;
-        if (!decode.LowConfidence  && !decode.Callsign.Contains("<"))
+        if (!decode.LowConfidence && IsValidCall(decode.Callsign))
         {
             if (_wsjtxInstance.TryGetValue(decode.Id, out var instance))
             {
@@ -206,6 +206,14 @@ public class FlexRadioSpotService:BackgroundService
         }
         
         return spot;
+    }
+    
+    private bool IsValidCall(string call)
+    {
+        if (call.Contains('<') || call.Contains('>')) return false;
+        if (call.All(char.IsDigit)) return false;
+        if (!call.Any(char.IsDigit)) return false;
+        return true;
     }
 
     private async Task RemoveSpot(FlexSpot spot)
