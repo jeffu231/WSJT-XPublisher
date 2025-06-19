@@ -1,4 +1,11 @@
 BuildTestConsole Changelog
+<a name="1.1.1"></a>
+## [1.1.1](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.1) (2025-06-19)
+
+### Continuous Integration
+
+* Add publish config ([3921b35](https://www.github.com/jeffu231/WSJT-XPublisher/commit/3921b35c4cc6d8956d32123bc1fc0ef373324339))
+
 <a name="1.1.0"></a>
 ## [1.1.0](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.0) (2025-06-19)
 
