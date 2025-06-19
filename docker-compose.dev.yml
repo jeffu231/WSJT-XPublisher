@@ -1,6 +1,13 @@
 services:
   wsjtx-services:
-    build: 
+    image: wsjtx-publisher
+    container_name: wsjtx-publisher-dev
+  
+    build:
       context: .
+      dockerfile: MessagePublisher/Dockerfile
+      args:
+        - GITHUB_USERNAME=${GITHUB_USERNAME}
+        - GITHUB_TOKEN=${GITHUB_TOKEN} 
       
 
