@@ -5,7 +5,7 @@
     <Version>1.2</Version>
     <Description>.NET Standard library for unpacking WSJT-X UDP datagrams</Description>
     <LangVersion>11</LangVersion>
-    <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
     <Nullable>annotations</Nullable>
   </PropertyGroup>
 
