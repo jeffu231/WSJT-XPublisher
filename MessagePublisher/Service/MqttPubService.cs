@@ -104,7 +104,7 @@ public class MqttPubService:BackgroundService
         }
         if(_wsjtxInstance.TryGetValue(status.Id, out var previousStatus))
         {
-            _logger.LogInformation("Found previous status for {StatusId}", status.Id);
+            _logger.LogDebug("Found previous status for {StatusId}", status.Id);
             if (status.DxCallsign != previousStatus.DxCallsign ||
                 status.DxGrid != previousStatus.DxGrid)
             {
