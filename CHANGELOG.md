@@ -1,4 +1,11 @@
 BuildTestConsole Changelog
+<a name="1.1.3"></a>
+## [1.1.3](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.3) (2025-06-19)
+
+### Logging
+
+* Change log message to debug to reduce chattyness ([e28145a](https://www.github.com/jeffu231/WSJT-XPublisher/commit/e28145a7384ab4205f057a22919c69e31a470bb4))
+
 <a name="1.1.2"></a>
 ## [1.1.2](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.2) (2025-06-19)
 
