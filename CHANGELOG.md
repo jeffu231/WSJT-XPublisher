@@ -1,4 +1,11 @@
 BuildTestConsole Changelog
+<a name="1.1.2"></a>
+## [1.1.2](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.2) (2025-06-19)
+
+### Continuous Integration
+
+* Add build key to linter ([5b63326](https://www.github.com/jeffu231/WSJT-XPublisher/commit/5b63326e450e820d976bd69695efa7e3475f03af))
+
 <a name="1.1.1"></a>
 ## [1.1.1](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.1) (2025-06-19)
 
