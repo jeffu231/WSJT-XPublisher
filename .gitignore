@@ -18,6 +18,8 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 
+.idea
+
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
