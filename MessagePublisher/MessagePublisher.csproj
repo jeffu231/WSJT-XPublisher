@@ -6,7 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-MessagePublisher-86B3794D-E7F3-4D76-8619-BB480B29C370</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <Version>1.1.3</Version>
+        <Version>1.1.4</Version>
         <AssemblyVersion>1.1.0</AssemblyVersion>
     </PropertyGroup>
     <PropertyGroup>

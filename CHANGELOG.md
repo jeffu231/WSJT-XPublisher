@@ -1,4 +1,12 @@
 BuildTestConsole Changelog
+<a name="1.1.4"></a>
+## [1.1.4](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.4) (2026-01-19)
+
+### Bug Fixes
+
+* update logging to json ([fed7ac6](https://www.github.com/jeffu231/WSJT-XPublisher/commit/fed7ac6849f5d6986e14c941975a10ee9d2447ba))
+* Update to ignore .idea folder ([5945b92](https://www.github.com/jeffu231/WSJT-XPublisher/commit/5945b92c2fb89cf104c43a7140c61f39ad1595e8))
+
 <a name="1.1.3"></a>
 ## [1.1.3](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.3) (2025-06-19)
 
