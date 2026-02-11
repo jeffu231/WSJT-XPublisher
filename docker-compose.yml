@@ -11,6 +11,11 @@ services:
     image: ghcr.io/jeffu231/wsjt-xpublisher:latest
     container_name: wsjtx-publisher
     restart: unless-stopped
-
     network_mode: "host"
+    volumes:
+      - wsjtx-publisher-api-settings:/app/appsettings
+
+volumes:
+  wsjtx-publisher-api-settings:
+    external: true
     

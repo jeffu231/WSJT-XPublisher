@@ -14,6 +14,8 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         
+        builder.Configuration.AddJsonFile("./appsettings/appsettings.user.json", optional:true, reloadOnChange: true);
+        
         ConfigureServices(builder);
 
         ConfigureApiVersioning(builder);

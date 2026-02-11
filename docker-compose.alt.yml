@@ -23,6 +23,8 @@ services:
       args:
         - GITHUB_USERNAME=${GITHUB_USERNAME}
         - GITHUB_TOKEN=${GITHUB_TOKEN}
+    volumes:
+      - wsjtx-publisher-api-settings:/app/appsettings
     
     labels:
       - "traefik.enable=true"
@@ -30,4 +32,8 @@ services:
 
 networks:
   traefik-net:
+    external: true
+    
+volumes:
+  wsjtx-publisher-api-settings:
     external: true
