@@ -1,4 +1,6 @@
 using MessagePublisher.Attributes;
+using MessagePublisher.Models;
+using MessagePublisher.Service;
 using Microsoft.AspNetCore.Mvc;
 using WsjtxClient.Messages.In;
 using WsjtxClient.Provider;
@@ -11,26 +13,40 @@ namespace MessagePublisher.Controller;
 public class WsjtxController: ControllerBase
 {
     private readonly ILogger<WsjtxController> _logger;
-    private readonly IWsjtxDataProvider _provider;
+    private readonly IWsjtxDataProviderManager _wsjtxDataProviderManager;
     
-    public WsjtxController(ILogger<WsjtxController> logger, IWsjtxDataProvider provider)
+    public WsjtxController(ILogger<WsjtxController> logger, IWsjtxDataProviderManager wsjtxDataWsjtxDataProviderManagerManager)
     {
         _logger = logger;
-        _provider = provider;
+        _wsjtxDataProviderManager = wsjtxDataWsjtxDataProviderManagerManager;
     }
     
     [HttpGet("wsjtx/instances")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Instances()
     {
-        return await Task.FromResult(Ok(_provider.Instances));
+        var instances = new List<string>();
+        foreach (var wsjtxDataProvider in _wsjtxDataProviderManager.WsjtxDataProviders)
+        {
+            foreach (var instance in wsjtxDataProvider.Instances)
+            {
+                instances.Add(instance);
+            }
+        }
+        
+        return await Task.FromResult(Ok(instances));
     }
     
     [HttpGet("wsjtx/{id}/status")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Status(string id)
     {
-        return await Task.FromResult(Ok(_provider.Status(id)));
+        var instances = _wsjtxDataProviderManager.WsjtxDataProviders.Where(x => x.Instances.Contains(id)).ToArray();
+        if (instances.Any())
+        {
+            return await Task.FromResult(Ok(instances.First().Status(id)));
+        }
+        return await Task.FromResult(NotFound("Id not found"));
     }
     
     [HttpPost("wsjtx/{id}/locator")]
@@ -42,6 +58,13 @@ public class WsjtxController: ControllerBase
             Id = id,
             Locator = locator
         };
-        return await Task.FromResult(Ok(_provider.SendMessage(lm)));
+        var guidId = Guid.Parse(id);
+        var instance = _wsjtxDataProviderManager.WsjtxDataProviders.Where(x => x.Id.Equals(guidId)).ToArray();
+        if (instance.Any())
+        {
+            return await Task.FromResult(Ok(instance.First().SendMessage(lm)));
+        }
+        
+        return await Task.FromResult(NotFound("Id not found"));
     }
 }
