@@ -2,7 +2,8 @@ services:
   wsjtx-services:
     image: wsjtx-publisher
     container_name: wsjtx-publisher-dev
-  
+    restart: unless-stopped
+    network_mode: "host"
     build:
       context: .
       dockerfile: MessagePublisher/Dockerfile
