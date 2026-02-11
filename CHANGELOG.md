@@ -1,4 +1,17 @@
 BuildTestConsole Changelog
+<a name="1.1.6"></a>
+## [1.1.6](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.6) (2026-02-11)
+
+### Bug Fixes
+
+* add host network setting for dev docker ([27008e5](https://www.github.com/jeffu231/WSJT-XPublisher/commit/27008e5910e39152715b878388f335de69ee29a0))
+* add missing example folder ([bd2a7c4](https://www.github.com/jeffu231/WSJT-XPublisher/commit/bd2a7c44c64f8610735062e83b4bd766dfb24e67))
+* fix broken web api endpoints ([fbfcf91](https://www.github.com/jeffu231/WSJT-XPublisher/commit/fbfcf910c2c5fc11d53b5c4603ef0c4fa4342d04))
+
+### Continuous Integration
+
+* exclude user specific files ([2ade340](https://www.github.com/jeffu231/WSJT-XPublisher/commit/2ade3407fb96192cff84fb042c8a3c709ca268a7))
+
 <a name="1.1.5"></a>
 ## [1.1.5](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.5) (2026-02-11)
 
