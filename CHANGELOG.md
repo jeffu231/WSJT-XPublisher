@@ -1,4 +1,12 @@
 BuildTestConsole Changelog
+<a name="1.1.5"></a>
+## [1.1.5](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.5) (2026-02-11)
+
+### Bug Fixes
+
+* remove obsolete local wsjtx client ([6b96943](https://www.github.com/jeffu231/WSJT-XPublisher/commit/6b96943896eb820fe1e9ab760ee2ff896acdec2f))
+* update to use a user settings file ([9985942](https://www.github.com/jeffu231/WSJT-XPublisher/commit/9985942829e2617b7b54e9a1d5c10f228226ae76))
+
 <a name="1.1.4"></a>
 ## [1.1.4](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.4) (2026-01-19)
 
