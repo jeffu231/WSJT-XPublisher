@@ -4,10 +4,12 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <Description>.NET application to publish information from WSJT-X to various destinations</Description>
+        <RepositoryUrl>https://github.com/jeffu231/WSJT-XPublisher</RepositoryUrl>
         <UserSecretsId>dotnet-MessagePublisher-86B3794D-E7F3-4D76-8619-BB480B29C370</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <Version>1.1.6</Version>
-        <AssemblyVersion>1.1.0</AssemblyVersion>
+        <Authors>Jeff Uchitjil</Authors>
     </PropertyGroup>
     <PropertyGroup>
         <ServerGarbageCollection>true</ServerGarbageCollection>
