@@ -1,4 +1,23 @@
 BuildTestConsole Changelog
+<a name="1.1.7"></a>
+## [1.1.7](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.7) (2026-02-12)
+
+### Bug Fixes
+
+* bump to latest wsjtxclient lib ([d6691f4](https://www.github.com/jeffu231/WSJT-XPublisher/commit/d6691f4fc8281ec73759adc29142cb94afa2f65e))
+* bump to net10 and remove unused libs ([dcd4f4b](https://www.github.com/jeffu231/WSJT-XPublisher/commit/dcd4f4b42f6112dd5fd30b302d21f14a794e6521))
+* convert newtonsoft json to system.text.json ([5582d5d](https://www.github.com/jeffu231/WSJT-XPublisher/commit/5582d5d27714e8ae6f8b78698411b5c12b17c6d3))
+* migrate to newer versioning libraries ([cd8e339](https://www.github.com/jeffu231/WSJT-XPublisher/commit/cd8e339f9e805dc7d708ac01d92e153e654fd7c6))
+* update MQTTnet to the latest 4.x version ([6efd25e](https://www.github.com/jeffu231/WSJT-XPublisher/commit/6efd25e4036dea68c54f56d26d9b444bba1f40d2))
+
+### Continuous Integration
+
+* remove unused code path from build file ([6373bc2](https://www.github.com/jeffu231/WSJT-XPublisher/commit/6373bc22390b502e82d876f8b3d3d7e5b010d5b7))
+
+### Documentation
+
+* add license and update meta data in proj file ([e1d8039](https://www.github.com/jeffu231/WSJT-XPublisher/commit/e1d8039888f120bb047e209c97037efa2db07ac4))
+
 <a name="1.1.6"></a>
 ## [1.1.6](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.6) (2026-02-11)
 
