@@ -1,4 +1,11 @@
 BuildTestConsole Changelog
+<a name="1.1.8"></a>
+## [1.1.8](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.8) (2026-02-12)
+
+### Bug Fixes
+
+* bump docker sdk env to v10 ([bcd810f](https://www.github.com/jeffu231/WSJT-XPublisher/commit/bcd810f436ac166932c9b68ef3e0bbd57c390d25))
+
 <a name="1.1.7"></a>
 ## [1.1.7](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.7) (2026-02-12)
 

@@ -8,7 +8,7 @@
         <RepositoryUrl>https://github.com/jeffu231/WSJT-XPublisher</RepositoryUrl>
         <UserSecretsId>dotnet-MessagePublisher-86B3794D-E7F3-4D76-8619-BB480B29C370</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <Version>1.1.7</Version>
+        <Version>1.1.8</Version>
         <Authors>Jeff Uchitjil</Authors>
     </PropertyGroup>
     <PropertyGroup>
