@@ -24,7 +24,7 @@
         <PackageReference Include="MQTTnet" Version="4.3.7.1207" />
         <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.3.7.1207" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.2" />
-        <PackageReference Include="wsjtxclient" Version="1.1.2" />
+        <PackageReference Include="wsjtxclient" Version="1.1.5" />
     </ItemGroup>
 
     <ItemGroup>
