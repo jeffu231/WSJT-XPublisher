@@ -1,10 +1,6 @@
-using MessagePublisher.Mqtt;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using MessagePublisher.Service;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.Net.Http.Headers;
-using WsjtxClient.Provider;
 
 namespace MessagePublisher;
 
@@ -72,11 +68,18 @@ public static class Program
         });
             
         // Add ApiExplorer to discover versions
-        builder.Services.AddVersionedApiExplorer(setup =>
-        {
-            setup.GroupNameFormat = "'v'VVV";
-            setup.SubstituteApiVersionInUrl = true;
-        });
+        builder.Services.AddApiVersioning(options =>
+            {
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ReportApiVersions = true;
+            })
+            .AddApiExplorer(options =>
+            {
+                // Configure options for the API explorer
+                options.GroupNameFormat = "'v'VVV"; // Formats the group name for Swagger, e.g., "v1" or "v1.1"
+                options.SubstituteApiVersionInUrl = true; // Automatically replaces {version} in routes
+            });
     }
 
     private static void ConfigureSwagger(WebApplicationBuilder builder)

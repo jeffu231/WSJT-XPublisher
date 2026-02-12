@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using MessagePublisher.Attributes;
 using MessagePublisher.Models;
 using MessagePublisher.Service;
