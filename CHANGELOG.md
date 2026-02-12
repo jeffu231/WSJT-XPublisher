@@ -1,4 +1,7 @@
 BuildTestConsole Changelog
+<a name="1.1.10"></a>
+## [1.1.10](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.10) (2026-02-12)
+
 <a name="1.1.9"></a>
 ## [1.1.9](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.9) (2026-02-12)
 
