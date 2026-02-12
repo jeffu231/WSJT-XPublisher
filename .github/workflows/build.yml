@@ -8,7 +8,6 @@ on:
       - master
     paths:
       - 'MessagePublisher/**'
-      - 'WsjtxUdpLib/**'
 
 env:
   REGISTRY: ghcr.io
