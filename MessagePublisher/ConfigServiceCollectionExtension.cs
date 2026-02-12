@@ -1,3 +1,4 @@
+using System.Text.Json;
 using MessagePublisher.Mqtt;
 using MessagePublisher.Service;
 using WsjtxClient.Provider;
@@ -39,12 +40,15 @@ public static class ConfigServiceCollectionExtension
         {
             o.RespectBrowserAcceptHeader = true;
             o.ReturnHttpNotAcceptable = true;
-        }).AddNewtonsoftJson().AddXmlSerializerFormatters();
+        })
+        .AddJsonOptions(opts =>
+        {
+            // If you want camelCase JSON (similar to your previous Newtonsoft camel-case usage)
+            opts.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            opts.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+        })
+            .AddXmlSerializerFormatters();
         
-       
-    
-    
-
         return services;
     }
 }

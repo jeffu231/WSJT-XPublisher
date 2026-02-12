@@ -3,8 +3,7 @@ using System.Globalization;
 using MaidenheadLib;
 using MessagePublisher.Models;
 using MessagePublisher.Mqtt;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
 using WsjtxClient.Events;
 using WsjtxClient.Models;
 
@@ -180,10 +179,15 @@ public class MqttPubService:BackgroundService
         {
             bearing = Bearing(status.DeGrid, status.DxGrid);
         }
-        var dxStation = new QsoInfo(status.DxCallsign, status.DxGrid, 
+        var dxStation = new QsoInfo(status.DxCallsign, status.DxGrid,
             bearing, status.DeCallsign, status.DeGrid);
-        await PublishValue(instance, "qso_info", JsonConvert.SerializeObject(dxStation,
-            new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() }));
+
+        var json = JsonSerializer.Serialize(dxStation, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+
+        await PublishValue(instance, "qso_info", json);
     }
 
     private async Task PublishBearing(string instance, string deGrid, string dxGrid)

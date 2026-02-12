@@ -39,21 +39,6 @@ public static class Program
     {
         Console.Out.WriteLine("Configure Services");
         builder.Services.ConfigureServicesFromConfig(builder.Configuration);
-        // services.AddSingleton<IWsjtxClient, WsjtxClient.Provider.WsjtxClient>();
-        // services.AddSingleton<IMqttClient, MqttClient>();
-        // services.AddSingleton<IWsjtxDataProvider, WsjtxDataProvider>();
-        // services.AddHostedService<IWsjtxDataProvider>(provider => provider.GetRequiredService<IWsjtxDataProvider>());
-        // services.AddHostedService<MqttPubService>();
-        // services.AddHostedService<DxMapsSpotService>();
-        // services.AddHostedService<FlexRadioSpotService>();
-        //
-        // services.AddProblemDetails();
-        //
-        // services.AddControllers(o =>
-        // {
-        //     o.RespectBrowserAcceptHeader = true;
-        //     o.ReturnHttpNotAcceptable = true;
-        // }).AddNewtonsoftJson().AddXmlSerializerFormatters();
     }
     
     private static void ConfigureApiVersioning(WebApplicationBuilder builder)
