@@ -1,4 +1,12 @@
 BuildTestConsole Changelog
+<a name="1.1.9"></a>
+## [1.1.9](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.9) (2026-02-12)
+
+### Bug Fixes
+
+* bump gitbub build to net 10 ([33b2abd](https://www.github.com/jeffu231/WSJT-XPublisher/commit/33b2abdb0a90e68eb081cb55e0776ff7b8fd3834))
+* update container base image ([caf2101](https://www.github.com/jeffu231/WSJT-XPublisher/commit/caf210178fb0fba999c36fcfc4bd4f8b291f3323))
+
 <a name="1.1.8"></a>
 ## [1.1.8](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.8) (2026-02-12)
 
