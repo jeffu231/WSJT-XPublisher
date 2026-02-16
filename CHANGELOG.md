@@ -1,4 +1,11 @@
 BuildTestConsole Changelog
+<a name="1.1.11"></a>
+## [1.1.11](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.11) (2026-02-16)
+
+### Bug Fixes
+
+* update maidenheadlib and swashbuckle to latest ([8ac57e8](https://www.github.com/jeffu231/WSJT-XPublisher/commit/8ac57e85d0fc6578797b6f6d451d2bdac3eeb787))
+
 <a name="1.1.10"></a>
 ## [1.1.10](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.10) (2026-02-12)
 
