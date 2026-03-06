@@ -1,4 +1,16 @@
 BuildTestConsole Changelog
+<a name="1.1.12"></a>
+## [1.1.12](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.12) (2026-03-06)
+
+### Bug Fixes
+
+* **Docker:** Clean up docker configurations ([87f216e](https://www.github.com/jeffu231/WSJT-XPublisher/commit/87f216ec66f24487b3bcd3715e6550e12f361102))
+* **docs:** Improve the docs on the API methods ([e26b3da](https://www.github.com/jeffu231/WSJT-XPublisher/commit/e26b3daa4c5036ee1116afaf7490fdeb71a88b54))
+
+### Continuous Integration
+
+* **Build:** Bumper action versions and add global.json support ([bc16653](https://www.github.com/jeffu231/WSJT-XPublisher/commit/bc166534f4bdf8b163829face4df4301348360f1))
+
 <a name="1.1.11"></a>
 ## [1.1.11](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.11) (2026-02-16)
 
