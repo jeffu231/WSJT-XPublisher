@@ -1,18 +1,18 @@
+################################################################################
+# WSJTX Services Compose Dev file
+# Use in conjuntion with docker-compose.yml for local development
+# Provide environment variables for GITHUB_USERNAME and GITHUB_TOKEN
+################################################################################
+# docker-compose -f docker-compose.yml -f docker-compose-dev.yml up -d
+################################################################################
+
 services:
   wsjtx-services:
     image: wsjtx-publisher
     container_name: wsjtx-publisher-dev
-    restart: unless-stopped
-    network_mode: "host"
     build:
       context: .
       dockerfile: MessagePublisher/Dockerfile
       args:
         - GITHUB_USERNAME=${GITHUB_USERNAME}
         - GITHUB_TOKEN=${GITHUB_TOKEN} 
-    volumes:
-      - wsjtx-publisher-api-settings:/app/appsettings
-volumes:
-  wsjtx-publisher-api-settings:
-    external: true
-

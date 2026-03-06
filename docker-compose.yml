@@ -3,7 +3,7 @@
 # This logic requires access to the host network in order to discover
 # the source ip of the incoming udp packets 
 ################################################################################
-# docker-compose -f docker-compose.yml -p wsjtx-services up
+# docker-compose -f docker-compose.yml up -d
 ################################################################################
 
 services:

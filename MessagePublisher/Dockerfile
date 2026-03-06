@@ -1,7 +1,5 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
-EXPOSE 2237/udp
-EXPOSE 8085
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
@@ -17,10 +15,14 @@ WORKDIR "/src/MessagePublisher"
 RUN dotnet build "MessagePublisher.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "MessagePublisher.csproj" -c Release -o /app/publish
+RUN dotnet publish "MessagePublisher.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
-#Bind host 2237 to container 2237 udp
+
 COPY --from=publish /app/publish .
+
+EXPOSE 2237/udp
+EXPOSE 8085
+
 ENTRYPOINT ["dotnet", "MessagePublisher.dll"]
