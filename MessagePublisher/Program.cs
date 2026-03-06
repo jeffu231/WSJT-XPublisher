@@ -1,3 +1,4 @@
+using System.Reflection;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using MessagePublisher.Service;
@@ -43,28 +44,21 @@ public static class Program
     
     private static void ConfigureApiVersioning(WebApplicationBuilder builder)
     {
-        builder.Services.AddApiVersioning(options =>
-        {
-            options.ReportApiVersions = true;
-            options.DefaultApiVersion = new ApiVersion(1, 0);
-            options.AssumeDefaultVersionWhenUnspecified = true;
-            options.ApiVersionReader = ApiVersionReader.Combine(new UrlSegmentApiVersionReader(),
-                new HeaderApiVersionReader("x-api-version"));
-        });
-            
         // Add ApiExplorer to discover versions
         builder.Services.AddApiVersioning(options =>
-            {
-                options.DefaultApiVersion = new ApiVersion(1, 0);
-                options.AssumeDefaultVersionWhenUnspecified = true;
-                options.ReportApiVersions = true;
-            })
-            .AddApiExplorer(options =>
-            {
-                // Configure options for the API explorer
-                options.GroupNameFormat = "'v'VVV"; // Formats the group name for Swagger, e.g., "v1" or "v1.1"
-                options.SubstituteApiVersionInUrl = true; // Automatically replaces {version} in routes
-            });
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+            options.ApiVersionReader = ApiVersionReader.Combine(new UrlSegmentApiVersionReader(),
+                new HeaderApiVersionReader("x-api-version"));
+        })
+        .AddApiExplorer(options =>
+        {
+            // Configure options for the API explorer
+            options.GroupNameFormat = "'v'VVV"; // Formats the group name for Swagger, e.g., "v1" or "v1.1"
+            options.SubstituteApiVersionInUrl = true; // Automatically replaces {version} in routes
+        });
     }
 
     private static void ConfigureSwagger(WebApplicationBuilder builder)
@@ -72,7 +66,11 @@ public static class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
             
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+        });
 
         builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
     }
