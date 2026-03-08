@@ -1,4 +1,11 @@
 BuildTestConsole Changelog
+<a name="1.2.0"></a>
+## [1.2.0](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.2.0) (2026-03-08)
+
+### Features
+
+* **Settings:** Update to use IOptions instead of IConfiguration ([615c65d](https://www.github.com/jeffu231/WSJT-XPublisher/commit/615c65d683f3ac4ad38a2b581e4c75d6b494410e))
+
 <a name="1.1.12"></a>
 ## [1.1.12](https://www.github.com/jeffu231/WSJT-XPublisher/releases/tag/v1.1.12) (2026-03-06)
 
