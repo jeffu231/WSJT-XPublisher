@@ -1,6 +1,8 @@
 using System.Reflection;
 using Asp.Versioning;
+using MessagePublisher.Models.Settings;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace MessagePublisher.Controller;
 
@@ -10,12 +12,17 @@ namespace MessagePublisher.Controller;
 public class ConfigurationController:ControllerBase
 {
     private readonly ILogger<ConfigurationController> _logger;
-    private readonly IConfiguration _config;
+    private readonly IOptions<FlexSpotSettings> _flexSpotSettings;
+    private readonly IOptions<MqttBrokerSettings> _mqttBrokerSettings;
+    private readonly IOptions<DxMapsSettings> _dxMapsSettings;
 
-    public ConfigurationController(ILogger<ConfigurationController> logger, IConfiguration configuration)
+    public ConfigurationController(ILogger<ConfigurationController> logger, IOptions<FlexSpotSettings> flexSpotSettings, 
+        IOptions<MqttBrokerSettings> mqttBrokerSettings, IOptions<DxMapsSettings> dxMapsSettings)
     {
         _logger = logger;
-        _config = configuration;
+        _flexSpotSettings = flexSpotSettings;
+        _mqttBrokerSettings = mqttBrokerSettings;
+        _dxMapsSettings = dxMapsSettings;
     }
     
     /// <summary>
@@ -38,7 +45,7 @@ public class ConfigurationController:ControllerBase
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> DxMapsEnabled()
     {
-        return await Task.FromResult(Ok(_config.GetValue<bool>("DxMaps:Enabled")));
+        return await Task.FromResult(Ok(_dxMapsSettings.Value.Enabled));
     }
     
     /// <summary>
@@ -49,11 +56,23 @@ public class ConfigurationController:ControllerBase
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> MqttEnabled()
     {
-        return await Task.FromResult(Ok(_config.GetValue<bool>("Mqtt:Enabled")));
+        return await Task.FromResult(Ok(_mqttBrokerSettings.Value.Enabled));
+    }
+    
+    /// <summary>
+    /// Retrieves the current enabled state of the Flex Spot feature from the configuration.
+    /// </summary>
+    /// <returns>Boolean value indicating whether the Flex Spot feature is enabled.</returns>
+    [HttpGet("flexspot/enabled")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> FlexSpotEnabled()
+    {
+        return await Task.FromResult(Ok(_flexSpotSettings.Value.Enabled));
     }
     
     /// <summary>
     /// Sets the enabled state of the DxMaps feature in the configuration.
+    /// This is not persisted across restarts.
     /// </summary>
     /// <param name="enable"></param>
     /// <returns>Result</returns>
@@ -61,11 +80,13 @@ public class ConfigurationController:ControllerBase
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> DxMapsEnabled(bool enable)
     {
-        return await Task.FromResult(Ok(_config["DxMaps:Enabled"] = enable.ToString()));
+        _dxMapsSettings.Value.Enabled = enable;
+        return await Task.FromResult(Ok(_dxMapsSettings.Value.Enabled));
     }
     
     /// <summary>
     /// Sets the enabled state of the MQTT feature in the configuration.
+    /// This is not persisted across restarts.
     /// </summary>
     /// <param name="enable"></param>
     /// <returns>Result</returns>
@@ -73,6 +94,21 @@ public class ConfigurationController:ControllerBase
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> MqttEnabled(bool enable)
     {
-        return await Task.FromResult(Ok(_config["Mqtt:Enabled"] = enable.ToString()));
+        _mqttBrokerSettings.Value.Enabled = enable;
+        return await Task.FromResult(Ok(_mqttBrokerSettings.Value.Enabled));
+    }
+    
+    /// <summary>
+    /// Sets the enabled state of the Flex Spot feature in the configuration.
+    /// This is not persisted across restarts.
+    /// </summary>
+    /// <param name="enable"></param>
+    /// <returns>Result</returns>
+    [HttpPost("flexspot/enabled/{enable}")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> FlexSpotEnabled(bool enable)
+    {
+        _flexSpotSettings.Value.Enabled = enable;
+        return await Task.FromResult(Ok(_flexSpotSettings.Value.Enabled));
     }
 }

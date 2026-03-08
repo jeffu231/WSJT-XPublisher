@@ -1,50 +1,51 @@
 using System.Collections.Concurrent;
 using MessagePublisher.Models;
+using MessagePublisher.Models.Settings;
+using Microsoft.Extensions.Options;
 using WsjtxClient.Events;
 using WsjtxClient.Models;
-using WsjtxClient.Provider;
 
 namespace MessagePublisher.Service;
 
 public class FlexRadioSpotService:BackgroundService
 {
     private readonly ILogger<FlexRadioSpotService> _logger;
-    private readonly IConfiguration _config;
     private readonly IWsjtxDataProviderManager _dataProviderManager;
     private readonly FlexRadioApiService _flexRadioApiService;
     private readonly ConcurrentDictionary<string, WsjtxStatus> _wsjtxInstance;
     private readonly ConcurrentQueue<FlexSpot> _spotQueue;
     private readonly Dictionary<string, FlexSpot> _txSpotList;
-    private bool _isEnabled;
-    
+    private readonly IOptions<FlexSpotSettings> _flexSpotSettings;
+
     private const string TransmitColor = "#FF0000";
     private const string ReceiveColor = "#FFFF00";
     private const string CqColor = "#01FF00";
     private const string TxText = "TX";
-    private readonly string _spotterCall;
+    private const string DefaultSpotterCall = "WSJTX";
     
-    public FlexRadioSpotService(IWsjtxDataProviderManager wsjtxDataProviderManager, IConfiguration configuration, 
-        FlexRadioApiService flexRadioApiService, ILogger<FlexRadioSpotService> logger)
+    
+    public FlexRadioSpotService(IWsjtxDataProviderManager wsjtxDataProviderManager, FlexRadioApiService flexRadioApiService,
+        ILogger<FlexRadioSpotService> logger, IOptions<FlexSpotSettings> flexSpotSettings)
     {
         _logger = logger;
-        _config = configuration;
+        _flexSpotSettings = flexSpotSettings;
         _dataProviderManager = wsjtxDataProviderManager;
         _flexRadioApiService = flexRadioApiService;
         _wsjtxInstance = new ConcurrentDictionary<string, WsjtxStatus>();
         _spotQueue = new ConcurrentQueue<FlexSpot>();
         _txSpotList = new Dictionary<string, FlexSpot>();
-        _spotterCall = configuration.GetValue<string>("FlexSpot:SpotterCall") ?? "WSJTX";
         _logger.LogDebug("Constructor exit");
     }
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogDebug("FlexSpot service execute starting");
+        _logger.LogInformation("FlexSpot service starting");
+        _logger.LogInformation("Initializing with settings: {Settings}", _flexSpotSettings.Value.ToString());
         await _flexRadioApiService.ClearSpotsAsync();
         
         while (!stoppingToken.IsCancellationRequested)
         {
-            IsEnabled = _config.GetValue<bool>("FlexSpot:Enabled");
+            IsEnabled = _flexSpotSettings.Value.Enabled;
             if (_spotQueue.Any())
             {
                 await SendSpots();
@@ -55,21 +56,21 @@ public class FlexRadioSpotService:BackgroundService
             
         }
         
-        _logger.LogDebug("DxMaps service execute finishing");
+        _logger.LogInformation("FlexSpot service finishing");
     }
 
     private bool IsEnabled
     {
-        get => _isEnabled;
+        get;
         set
         {
-            if(_isEnabled == value) return;
-            _isEnabled = value;
-            if (_isEnabled)
+            if (field == value) return;
+            field = value;
+            if (field)
             {
                 foreach (var wsjtxDataProvider in _dataProviderManager.WsjtxDataProviders)
                 {
-                    _logger.LogDebug("Subscribing to provider {Id}", wsjtxDataProvider.Id);
+                    _logger.LogInformation("Subscribing to provider {Id}", wsjtxDataProvider.Id);
                     wsjtxDataProvider.DecodeReceived += DataProviderManagerOnDataReceived;
                     wsjtxDataProvider.StatusReceived += DataProviderManagerOnStatusReceived;
                 }
@@ -78,19 +79,19 @@ public class FlexRadioSpotService:BackgroundService
             {
                 foreach (var wsjtxDataProvider in _dataProviderManager.WsjtxDataProviders)
                 {
-                    _logger.LogDebug("UnSubscribing to provider {Id}", wsjtxDataProvider.Id);
+                    _logger.LogInformation("UnSubscribing to provider {Id}", wsjtxDataProvider.Id);
                     wsjtxDataProvider.DecodeReceived -= DataProviderManagerOnDataReceived;
                     wsjtxDataProvider.StatusReceived -= DataProviderManagerOnStatusReceived;
                 }
             }
-            
-            _logger.LogInformation("FlexSpots Enabled {Disabled}", _isEnabled);
+
+            _logger.LogInformation("FlexSpots Enabled: {Disabled}", field);
         }
     }
-    
+
     private void DataProviderManagerOnDataReceived(object? sender, WsjtxDecodeEventArgs e)
     {
-        _logger.LogDebug("WSJT-X Data Message {data}", e.Decode);
+        _logger.LogDebug("WSJT-X Data Message {Decode}", e.Decode);
 
         var decode = e.Decode;
         if (!decode.LowConfidence && IsValidCall(decode.Callsign))
@@ -105,17 +106,24 @@ public class FlexRadioSpotService:BackgroundService
 
     private async void DataProviderManagerOnStatusReceived(object? sender, WsjtxStatusEventArgs e)
     {
-        _logger.LogDebug("WSJT-X Status Message {Status}", e.Status);
+        try
+        {
+            _logger.LogDebug("WSJT-X Status Message {Status}", e.Status);
         
-        if (_wsjtxInstance.TryGetValue(e.Status.Id, out var status))
-        {
-            _wsjtxInstance[e.Status.Id] = e.Status;
+            if (_wsjtxInstance.TryGetValue(e.Status.Id, out _))
+            {
+                _wsjtxInstance[e.Status.Id] = e.Status;
+            }
+            else
+            {
+                _wsjtxInstance.TryAdd(e.Status.Id, e.Status);
+            }
+            await UpdateOrCreateTransmitSpot(e.Status);
         }
-        else
+        catch (Exception ex)
         {
-            _wsjtxInstance.TryAdd(e.Status.Id, e.Status);
+            _logger.LogError(ex, "Error updating transmit spot");
         }
-        await UpdateOrCreateTransmitSpot(e.Status);
     }
 
     private async Task UpdateOrCreateTransmitSpot(WsjtxStatus status)
@@ -127,7 +135,7 @@ public class FlexRadioSpotService:BackgroundService
         var updateSpot = false;
         if (_txSpotList.TryGetValue(status.Id.Replace(" ", "_"), out var oldSpot))
         {
-            var f = (double)((status.DialFrequency + (ulong)status.TxDF) * .000001m);
+            var f = (double)((status.DialFrequency + status.TxDF) * .000001m);
             if (Math.Abs(oldSpot.RxFrequency - f) > .00001)
             {
                 updateSpot = true;
@@ -193,7 +201,8 @@ public class FlexRadioSpotService:BackgroundService
             Source = decode.Id,
             TriggerAction = "None",
             Comment = decode.Message,
-            SpotterCallsign = _spotterCall,
+            SpotterCallsign = string.IsNullOrEmpty(_flexSpotSettings.Value.SpotterCall)?DefaultSpotterCall:
+                _flexSpotSettings.Value.SpotterCall,
             Priority = 5,
             Color = ReceiveColor
         };
@@ -240,7 +249,7 @@ public class FlexRadioSpotService:BackgroundService
             if (spots.Any())
             {
                 await _flexRadioApiService.SendSpotsAsync(spots);
-                _logger.LogInformation("Sent {Count} Spots to the Flex", spots.Count);
+                _logger.LogDebug("Sent {Count} Spots to the Flex", spots.Count);
             }
         }
     }

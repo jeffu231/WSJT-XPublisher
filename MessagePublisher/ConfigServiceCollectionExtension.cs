@@ -22,7 +22,7 @@ public static class ConfigServiceCollectionExtension
     
         foreach (var listener in listeners)
         {
-            Console.Out.WriteLine($"Adding listener on port {listener.Port}");
+            Console.Out.WriteLine($"Adding WSJT-X listener on port {listener.Port}");
             services.AddSingleton<IHostedService>(x => new WsjtxDataProvider(
                 x.GetRequiredService<ILogger<WsjtxDataProvider>>(),
                 x.GetRequiredService<IWsjtxClient>(),

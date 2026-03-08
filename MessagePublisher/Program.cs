@@ -1,6 +1,7 @@
 using System.Reflection;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using MessagePublisher.Models.Settings;
 using MessagePublisher.Service;
 
 namespace MessagePublisher;
@@ -11,16 +12,12 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         
-        builder.Configuration.AddJsonFile("./appsettings/appsettings.user.json", optional:true, reloadOnChange: true);
-        
         ConfigureServices(builder);
 
         ConfigureApiVersioning(builder);
             
         ConfigureSwagger(builder);
         
-        builder.Services.AddHttpClient<FlexRadioApiService>();
-
         var app = builder.Build();
 
         EnableSwagger(app);
@@ -38,8 +35,13 @@ public static class Program
 
     private static void ConfigureServices(WebApplicationBuilder builder)
     {
-        Console.Out.WriteLine("Configure Services");
+        Console.Out.WriteLine("Configuring Services");
+        builder.Configuration.AddJsonFile("./appsettings/appsettings.user.json", optional:false, reloadOnChange: true);
+        builder.Services.Configure<FlexSpotSettings>(builder.Configuration.GetSection("FlexSpot"));
+        builder.Services.Configure<DxMapsSettings>(builder.Configuration.GetSection("DxMaps"));
+        builder.Services.Configure<MqttBrokerSettings>(builder.Configuration.GetSection("Mqtt"));
         builder.Services.ConfigureServicesFromConfig(builder.Configuration);
+        builder.Services.AddHttpClient<FlexRadioApiService>();
     }
     
     private static void ConfigureApiVersioning(WebApplicationBuilder builder)

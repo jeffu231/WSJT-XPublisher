@@ -1,30 +1,30 @@
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.RegularExpressions;
 using MessagePublisher.Models;
+using MessagePublisher.Models.Settings;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using WsjtxClient.Events;
 using WsjtxClient.Models;
-using WsjtxClient.Provider;
 
 namespace MessagePublisher.Service;
 
 public class DxMapsSpotService: BackgroundService
 {
     private readonly ILogger<DxMapsSpotService> _logger;
-    private readonly IConfiguration _config;
     private readonly IWsjtxDataProviderManager _dataProviderManager;
     private readonly ConcurrentDictionary<string, WsjtxStatus> _wsjtxInstance;
     private readonly Dictionary<string, MemoryCache> _callCaches;
     private readonly UdpClient _udpClient;
-    private bool _isEnabled;
+    private readonly IOptions<DxMapsSettings> _dxMapsSettings;
 
-    public DxMapsSpotService(IWsjtxDataProviderManager wsjtxDataProviderManager, IConfiguration configuration, ILogger<DxMapsSpotService> logger)
+    public DxMapsSpotService(IWsjtxDataProviderManager wsjtxDataProviderManager, IOptions<DxMapsSettings> dxMapsSettings, 
+        ILogger<DxMapsSpotService> logger)
     {
         _logger = logger;
-        _config = configuration;
         _dataProviderManager = wsjtxDataProviderManager;
+        _dxMapsSettings = dxMapsSettings;
         _wsjtxInstance = new ConcurrentDictionary<string, WsjtxStatus>();
         _callCaches = new Dictionary<string, MemoryCache>();
         _logger.LogDebug("DxMaps service ctr");
@@ -33,12 +33,12 @@ public class DxMapsSpotService: BackgroundService
 
     public bool IsEnabled
     {
-        get => _isEnabled;
+        get;
         set
         {
-            if(_isEnabled == value) return;
-            _isEnabled = value;
-            if (_isEnabled)
+            if (field == value) return;
+            field = value;
+            if (field)
             {
                 foreach (var wsjtxDataProvider in _dataProviderManager.WsjtxDataProviders)
                 {
@@ -46,7 +46,6 @@ public class DxMapsSpotService: BackgroundService
                     wsjtxDataProvider.DecodeReceived += DataProviderManagerOnDataReceived;
                     wsjtxDataProvider.StatusReceived += DataProviderManagerOnStatusReceived;
                 }
-                
             }
             else
             {
@@ -57,29 +56,28 @@ public class DxMapsSpotService: BackgroundService
                     wsjtxDataProvider.StatusReceived -= DataProviderManagerOnStatusReceived;
                 }
             }
-            
-            _logger.LogInformation("DxMaps Enabled {Disabled}", _isEnabled);
-            _logger.LogInformation("DxMaps Send Spot Enabled {Enabled}", 
-                _config.GetValue<bool>("DxMaps:SendSpot"));
+
+            _logger.LogInformation("DxMaps Enabled {Disabled}", field);
+            _logger.LogInformation("DxMaps Send Spot Enabled {Enabled}", _dxMapsSettings.Value.SendSpot); 
         }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogDebug("DxMaps service execute starting");
-        
+        _logger.LogInformation("DxMaps service starting");
+        _logger.LogInformation("Initializing with settings: {Settings}", _dxMapsSettings.Value.ToString());
         while (!stoppingToken.IsCancellationRequested)
         {
-            IsEnabled = _config.GetValue<bool>("DxMaps:Enabled");
+            IsEnabled = _dxMapsSettings.Value.Enabled;
             await Task.Delay(1000, stoppingToken);
         }
         
-        _logger.LogDebug("DxMaps service execute finishing");
+        _logger.LogInformation("DxMaps service finishing");
     }
     
     private async void DataProviderManagerOnDataReceived(object? sender, WsjtxDecodeEventArgs e)
     {
-        _logger.LogDebug("WSJT-X Data Message {data}", e.Decode);
+        _logger.LogDebug("WSJT-X Data Message {Decode}", e.Decode);
 
         var decode = e.Decode;
         if (!decode.LowConfidence && decode.IsExchangeGrid && IsValidCall(decode.Callsign))
@@ -166,11 +164,11 @@ public class DxMapsSpotService: BackgroundService
             return;
         }
         
-        if (_config.GetValue<bool>("DxMaps:SendSpot"))
+        if (_dxMapsSettings.Value.SendSpot)
         {
             var buffer = Encoding.ASCII.GetBytes(spot.CreateSpotMessage());
-            var sent = await _udpClient.SendAsync(buffer, buffer.Length, _config["DxMaps:Host"], 
-                _config.GetValue<int>("DxMaps:Port"));
+            var sent = await _udpClient.SendAsync(buffer, buffer.Length, _dxMapsSettings.Value.Host, 
+                _dxMapsSettings.Value.Port);
             _logger.LogInformation("Sent {Payload} of {Sent} bytes to DxMaps", spot.CreateSpotMessage(), sent);
         }
         else

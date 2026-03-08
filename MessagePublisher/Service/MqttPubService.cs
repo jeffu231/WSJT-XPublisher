@@ -4,6 +4,8 @@ using MaidenheadLib;
 using MessagePublisher.Models;
 using MessagePublisher.Mqtt;
 using System.Text.Json;
+using MessagePublisher.Models.Settings;
+using Microsoft.Extensions.Options;
 using WsjtxClient.Events;
 using WsjtxClient.Models;
 
@@ -16,62 +18,61 @@ public class MqttPubService:BackgroundService
     private readonly string _rootTopic;
     private readonly IMqttClient _mqttClient;
     private readonly ILogger<MqttPubService> _logger;
-    private readonly IConfiguration _config;
-    private bool _isEnabled;
+    private readonly IOptions<MqttBrokerSettings> _mqttBrokerSettings;
 
-    public MqttPubService(IMqttClient mqttClient, IWsjtxDataProviderManager wsjtxDataProviderManager, IConfiguration configuration, ILogger<MqttPubService> logger)
+    public MqttPubService(IMqttClient mqttClient, IWsjtxDataProviderManager wsjtxDataProviderManager, 
+        IOptions<MqttBrokerSettings> mqttBrokerSettings, ILogger<MqttPubService> logger)
     {
         _mqttClient = mqttClient;
         _dataProviderManager = wsjtxDataProviderManager;
+        _mqttBrokerSettings = mqttBrokerSettings;
         _logger = logger;
-        _config = configuration;
-        _rootTopic = configuration["Mqtt:RootTopic"]?? string.Empty;
+        _rootTopic = mqttBrokerSettings.Value.RootTopic;
         _wsjtxInstance = new ConcurrentDictionary<string, WsjtxStatus>();
         _logger.LogDebug("MQTT Pub service ctr");
 
     }
-    
+
     public bool IsEnabled
     {
-        get => _isEnabled;
+        get;
         set
         {
-            if(_isEnabled == value) return;
-            _isEnabled = value;
-            if (_isEnabled)
+            if (field == value) return;
+            field = value;
+            if (field)
             {
                 foreach (var wsjtxDataProvider in _dataProviderManager.WsjtxDataProviders)
                 {
-                    _logger.LogDebug("Subscribing to provider {Id}", wsjtxDataProvider.Id);
+                    _logger.LogInformation("Subscribing to provider {Id}", wsjtxDataProvider.Id);
                     wsjtxDataProvider.DecodeReceived += DataProviderOnDataReceived;
                     wsjtxDataProvider.StatusReceived += DataProviderOnStatusReceived;
                 }
-                
             }
             else
             {
                 foreach (var wsjtxDataProvider in _dataProviderManager.WsjtxDataProviders)
                 {
-                    _logger.LogDebug("UnSubscribing to provider {Id}", wsjtxDataProvider.Id);
+                    _logger.LogInformation("UnSubscribing to provider {Id}", wsjtxDataProvider.Id);
                     wsjtxDataProvider.DecodeReceived -= DataProviderOnDataReceived;
                     wsjtxDataProvider.StatusReceived -= DataProviderOnStatusReceived;
                 }
             }
-            
-            _logger.LogInformation("Mqtt Enabled {Disabled}", _isEnabled);
+
+            _logger.LogInformation("Mqtt Enabled {Disabled}", field);
         }
     }
-    
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogDebug("MQTT Pub service Execute");
-        
+        _logger.LogDebug("MQTT Pub service starting");
+        _logger.LogInformation("Initializing with settings: {Settings}", _mqttBrokerSettings.Value.ToString());
         while (!stoppingToken.IsCancellationRequested)
         {
-            IsEnabled = _config.GetValue<bool>("Mqtt:Enabled");
+            IsEnabled = _mqttBrokerSettings.Value.Enabled;
             await Task.Delay(1000, stoppingToken);
         }
-        _logger.LogDebug("MQTT service execute finishing");
+        _logger.LogDebug("MQTT service finishing");
     }
     
     private void DataProviderOnDataReceived(object? sender, WsjtxDecodeEventArgs e)
@@ -81,7 +82,7 @@ public class MqttPubService:BackgroundService
 
     private async void DataProviderOnStatusReceived(object? sender, WsjtxStatusEventArgs e)
     {
-        //_logger.LogDebug("WSJT-X Status Message {Status}", e.Status);
+        _logger.LogDebug("WSJT-X Status Message {Status}", e.Status);
         await PublishStatus(e.Status);
         if (_wsjtxInstance.ContainsKey(e.Status.Id))
         {
